@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "orchestrate",
   "displayName": "logiccloud orchestrate",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Manage edge devices and roll out applications with logiccloud orchestrate (formerly Fleet Manager): the orchestrate MCP server (API key) and skills for the lco CLI.",
   "author": {
     "name": "logiccloud AG",

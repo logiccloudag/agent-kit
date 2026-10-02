@@ -1,40 +1,57 @@
 ---
 name: logiccloud
-description: Use when working on a logiccloud PLC project with the lc CLI - finding, creating or pulling a project, writing IEC 61131-3 Structured Text, building it in the cloud, tasks and program configurations, Inputs/Outputs pragmas, libraries.
+description: Use when working on a logiccloud PLC project - finding, creating or pulling a project, writing IEC 61131-3 Structured Text, building it in the cloud, tasks and program configurations, Inputs/Outputs pragmas, libraries. Covers both the lc CLI and the logiccloud MCP server (logiccloud-control).
 ---
 
-# logiccloud projects with lc
+# logiccloud projects
 
-`lc` edits a logiccloud project in a local directory and compiles it in the
-cloud. It is logged in once per machine (`lc login -domain <domain>`, with
-the root domain of the user's installation); if a command says there is no
-token, ask the user to run `lc login`.
+There are two ways to work on a project. Use whichever is available; if both
+are, prefer `lc`, because the files stay in a local directory under version
+control.
 
-Without `lc`, the logiccloud MCP server (`logiccloud-control`) offers the same
-as tools (`list_projects`, `read_files`, `write_files` with a build, `deploy`,
-...); its instructions say how. Use the CLI when both are there: a local
-workspace keeps the files under version control.
+- **The `lc` CLI** keeps a project in a local directory (a workspace) and
+  builds it in the cloud. It is logged in once per machine
+  (`lc login -domain <domain>`, with the root domain of the user's
+  installation). If a command says there is no token, ask the user to run
+  `lc login`.
+- **The MCP server `logiccloud-control`** offers the same as tools, working
+  directly on the project in the cloud. If the tools are missing or say the
+  user is not logged in, ask the user to log in through their agent (`/mcp`
+  in Claude Code, `codex mcp login logiccloud-control`,
+  `opencode mcp auth logiccloud-control`).
 
-## Get a workspace
+| Task | lc | MCP tool |
+|---|---|---|
+| Find a project | `lc projects -keyword <word>` | `list_projects` |
+| Show one | `lc project <id>` | `get_project` |
+| New project | `lc init -name "<Name>" -dir <dir>` | `create_project` |
+| New library | `lc init -name "<Name>" -type plcLibrary -dir <dir>` | `create_project` with type `plcLibrary` |
+| Get the sources | `lc pull <projectId>` in an empty directory | `list_files`, `read_files` |
+| Change and build | edit the files, then `lc check` | `write_files` with `build: true` |
+| Only build | `lc build` | `build` |
+| Libraries | `lc libraries`, `lc library add/remove <name>` | `list_libraries`, `add_library`, `remove_library` |
+| Anything else | `lc query '<GraphQL>'` | `graphql` |
 
-    lc projects -keyword <word>        # find a project, note its ID
-    mkdir <name> && cd <name>
-    lc pull <projectId>                # sources, configuration, HMI pages, libraries
-
-    lc init -name "<Name>" -dir <dir>  # or: a new project from the portal's template
-    lc init -name "<Name>" -type plcLibrary -dir <dir>   # a library for other projects
-
-A workspace has its own AGENTS.md (CLAUDE.md for Claude Code) with the full
-rules (layout, pragmas, configuration, HMI format). Read it before editing, and
-follow it.
+Paths are the same both ways: `pous/<folders>/<Name>.st` (one PROGRAM,
+FUNCTION_BLOCK or FUNCTION per file, file name = POU name),
+`dataTypes/<Name>.st`, `globalVariables/<Name>.st`,
+`configuration/<Name>.json` (tasks and program configurations),
+`libraries/...` (read-only) and `hmi/<Name>.page.json`. The full rules
+(layout, pragmas, configuration format, HMI format) are in the workspace's
+AGENTS.md (CLAUDE.md for Claude Code) with `lc`, and in the MCP server's
+instructions with the tools. Read them before editing, and follow them.
 
 ## The loop
 
-1. Edit `.st` files under `pous/`, `dataTypes/`, `globalVariables/`, and
-   `configuration/<Name>.json` for tasks and program configurations.
-2. `lc check` pushes and builds; it prints `file:line:col: message` and exits 1
-   on errors. Fix and repeat until it passes (3-15 s per build).
-3. `lc status` shows local changes without network access.
+1. Write Structured Text, and `configuration/<Name>.json` for tasks and
+   program configurations.
+2. Build. `lc check` pushes and builds; `write_files` with `build: true`
+   writes and builds. Both report `file:line:col: message`; `lc check` exits
+   1 on errors. Fix and repeat until the build passes (3-15 s per build).
+3. With `lc`, `lc status` shows local changes without network access. With
+   the tools, `write_files` takes complete files, and refuses to overwrite a
+   file someone changed in the portal meanwhile: read it again and redo the
+   change.
 
 ## Rules that matter
 
@@ -44,14 +61,16 @@ follow it.
   `running : BOOL {OUT HMI};`, `mode : INT {IN_OUT HMI};` (named `mode_OUT`
   under Inputs/Outputs). `HMI` makes them usable in HMI pages.
 - `libraries/` is read-only: those function blocks can be used, not changed.
-  To change a library, pull the library project itself. A library cannot be
-  built on its own: in its workspace, `lc check -with <dir or ID of a project
-  that uses it>`.
+  To change a library, open the library project itself. A library cannot be
+  built on its own: with `lc`, run `lc check -with <dir or ID of a project
+  that uses it>` in its workspace; with the tools, `write_files` with
+  `buildProjectId` set to such a project.
 - A passing build does not check mixed-type arithmetic or numbers assigned to
   BOOL; write explicit conversions.
-- The project is shared. Never use `-force` or `-prune`, and never
-  `lc library add/remove`, `lc project delete` or `lc runtime delete`, unless the
-  user asked for exactly that.
+- The project is shared. Unless the user asked for exactly that, never:
+  use `-force` or `-prune` (`prune` in the tools), add or remove libraries,
+  delete files, or delete a project or runtime (`lc project delete`,
+  `lc runtime delete`, `delete_project`, `delete_runtime`).
 
 For HMI pages use the logiccloud-hmi skill; for devices, deploying, logs and
 connections the logiccloud-devices skill.
