@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "logiccloud",
+  "description": "logiccloud control and orchestrate for coding agents: MCP servers and skills.",
+  "owner": { "name": "logiccloud AG", "url": "https://logiccloud.com" },
+  "plugins": [
+    {
+      "name": "control",
+      "source": "./plugins/control",
+      "description": "logiccloud control: PLC projects in Structured Text, cloud builds, HMI pages, devices and connections (MCP server with OAuth, lc skills).",
+      "category": "development"
+    },
+    {
+      "name": "orchestrate",
+      "source": "./plugins/orchestrate",
+      "description": "logiccloud orchestrate: edge devices, logs, telemetry and application rollouts (MCP server with an API key, lco skills).",
+      "category": "development"
+    }
+  ]
+}

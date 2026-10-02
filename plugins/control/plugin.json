@@ -1,0 +1,37 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "control",
+  "version": "1.0.1",
+  "description": "Write, build and deploy IEC 61131-3 PLC projects and HMI pages in logiccloud control: the logiccloud MCP server (OAuth login) and skills for the lc CLI.",
+  "author": {
+    "name": "logiccloud AG",
+    "url": "https://logiccloud.com"
+  },
+  "homepage": "https://github.com/logiccloudag/agent-kit",
+  "repository": "https://github.com/logiccloudag/agent-kit",
+  "license": "Apache-2.0",
+  "keywords": [
+    "logiccloud",
+    "plc",
+    "iec-61131-3",
+    "structured-text",
+    "hmi",
+    "mcp"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "logiccloud control",
+        "shortDescription": "PLC projects, HMI pages and devices in logiccloud control",
+        "longDescription": "Write, build and deploy IEC 61131-3 PLC projects and HMI pages in logiccloud control: the logiccloud MCP server (OAuth login) and skills for the lc CLI. Connect the MCP server with setup.sh from the repository (it needs your installation's domain).",
+        "developerName": "logiccloud AG",
+        "category": "Developer Tools",
+        "websiteURL": "https://github.com/logiccloudag/agent-kit",
+        "defaultPrompt": [
+          "List my logiccloud projects.",
+          "Pull this logiccloud project and build it."
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "orchestrate",
+  "version": "1.0.1",
+  "description": "Manage edge devices and roll out applications with logiccloud orchestrate (formerly Fleet Manager): the orchestrate MCP server (API key) and skills for the lco CLI.",
+  "author": {
+    "name": "logiccloud AG",
+    "url": "https://logiccloud.com"
+  },
+  "homepage": "https://github.com/logiccloudag/agent-kit",
+  "repository": "https://github.com/logiccloudag/agent-kit",
+  "license": "Apache-2.0",
+  "keywords": [
+    "logiccloud",
+    "orchestrate",
+    "fleet-manager",
+    "edge",
+    "margo",
+    "deployments",
+    "mcp"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "logiccloud orchestrate",
+        "shortDescription": "Edge devices and deployments in logiccloud orchestrate",
+        "longDescription": "Manage edge devices and roll out applications with logiccloud orchestrate (formerly Fleet Manager): the orchestrate MCP server (API key) and skills for the lco CLI. Connect the MCP server with setup.sh from the repository (it needs your installation's domain).",
+        "developerName": "logiccloud AG",
+        "category": "Developer Tools",
+        "websiteURL": "https://github.com/logiccloudag/agent-kit",
+        "defaultPrompt": [
+          "Show the fleet health in orchestrate.",
+          "Which devices are offline?"
+        ]
+      }
+    }
+  }
+}

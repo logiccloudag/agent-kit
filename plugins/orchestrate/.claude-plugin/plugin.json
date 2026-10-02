@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "orchestrate",
+  "displayName": "logiccloud orchestrate",
+  "version": "1.0.1",
+  "description": "Manage edge devices and roll out applications with logiccloud orchestrate (formerly Fleet Manager): the orchestrate MCP server (API key) and skills for the lco CLI.",
+  "author": {
+    "name": "logiccloud AG",
+    "url": "https://logiccloud.com"
+  },
+  "homepage": "https://github.com/logiccloudag/agent-kit",
+  "repository": "https://github.com/logiccloudag/agent-kit",
+  "license": "Apache-2.0",
+  "keywords": [
+    "logiccloud",
+    "orchestrate",
+    "fleet-manager",
+    "edge",
+    "margo",
+    "deployments",
+    "mcp"
+  ],
+  "userConfig": {
+    "domain": {
+      "type": "string",
+      "title": "orchestrate domain",
+      "description": "Root domain of your orchestrate installation, without https:// (e.g. orchestrate.example.com). The MCP server is https://mcp.<domain>/mcp.",
+      "required": true
+    },
+    "api_key": {
+      "type": "string",
+      "title": "orchestrate API key",
+      "description": "An API key from orchestrate (Settings > Security > API Keys). Its scopes decide what the agent may do.",
+      "required": true,
+      "sensitive": true
+    }
+  },
+  "mcpServers": {
+    "logiccloud-orchestrate": {
+      "type": "http",
+      "url": "https://mcp.${user_config.domain}/mcp",
+      "headers": {
+        "X-API-Key": "${user_config.api_key}"
+      }
+    }
+  }
+}

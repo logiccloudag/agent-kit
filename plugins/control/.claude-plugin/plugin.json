@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "control",
+  "displayName": "logiccloud control",
+  "version": "1.0.1",
+  "description": "Write, build and deploy IEC 61131-3 PLC projects and HMI pages in logiccloud control: the logiccloud MCP server (OAuth login) and skills for the lc CLI.",
+  "author": {
+    "name": "logiccloud AG",
+    "url": "https://logiccloud.com"
+  },
+  "homepage": "https://github.com/logiccloudag/agent-kit",
+  "repository": "https://github.com/logiccloudag/agent-kit",
+  "license": "Apache-2.0",
+  "keywords": [
+    "logiccloud",
+    "plc",
+    "iec-61131-3",
+    "structured-text",
+    "hmi",
+    "mcp"
+  ],
+  "userConfig": {
+    "domain": {
+      "type": "string",
+      "title": "logiccloud domain",
+      "description": "Root domain of your logiccloud installation, without https:// (e.g. logiccloud.example.com). The MCP server is https://mcp.<domain>/mcp, the login https://auth.<domain>.",
+      "required": true
+    }
+  },
+  "mcpServers": {
+    "logiccloud-control": {
+      "type": "http",
+      "url": "https://mcp.${user_config.domain}/mcp",
+      "oauth": {
+        "clientId": "lc-mcp",
+        "callbackPort": 33418,
+        "scopes": "openid profile email offline_access"
+      }
+    }
+  }
+}

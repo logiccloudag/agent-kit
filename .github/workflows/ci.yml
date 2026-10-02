@@ -1,0 +1,34 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repository checks
+        run: scripts/check.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Validate the marketplace and plugins
+        run: |
+          claude plugin validate .
+          for p in plugins/*/; do claude plugin validate "$p"; done
+      - name: setup.sh against this checkout
+        env:
+          AGENT_KIT_SOURCE: ${{ github.workspace }}
+        run: |
+          ./setup.sh --agents claude --control logiccloud.example.com --orchestrate orchestrate.example.com --no-login
+          claude plugin list | grep -q control@logiccloud
+          claude plugin list | grep -q orchestrate@logiccloud
+          ./setup.sh --agents claude --remove
