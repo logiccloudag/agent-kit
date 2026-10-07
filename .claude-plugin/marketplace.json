@@ -13,7 +13,7 @@
     {
       "name": "orchestrate",
       "source": "./plugins/orchestrate",
-      "description": "logiccloud orchestrate: edge devices, logs, telemetry and application rollouts (MCP server with an API key, lco skills).",
+      "description": "logiccloud orchestrate: edge devices, logs, telemetry and application rollouts (MCP server with OAuth, lco skills).",
       "category": "development"
     }
   ]

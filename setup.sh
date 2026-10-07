@@ -5,7 +5,7 @@
 # domain:
 #
 #   control      https://mcp.<domain>/mcp   login at https://auth.<domain> (OAuth, client lc-mcp)
-#   orchestrate  https://mcp.<domain>/mcp   API key in the X-API-Key header
+#   orchestrate  https://mcp.<domain>/mcp   login at https://keycloak.<domain> (OAuth, client lco-mcp)
 #
 #   curl -fsSL https://raw.githubusercontent.com/logiccloudag/agent-kit/main/setup.sh | bash -s -- \
 #     --control logiccloud.example.com --orchestrate orchestrate.example.com
@@ -20,9 +20,9 @@ MARKETPLACE=logiccloud
 CONTROL_SERVER=logiccloud-control
 ORCH_SERVER=logiccloud-orchestrate
 CLIENT_ID=lc-mcp
+ORCH_CLIENT_ID=lco-mcp
 CALLBACK_PORT=33418
 SCOPES="openid profile email offline_access"
-KEY_VAR=LCO_API_KEY
 
 SOURCE=${AGENT_KIT_SOURCE:-$REPO} # owner/repo on GitHub, or a local checkout
 REF=${AGENT_KIT_REF:-main}
@@ -46,13 +46,13 @@ Options:
   --control DOMAIN       logiccloud control: MCP server https://mcp.DOMAIN/mcp, skills for lc
   --orchestrate DOMAIN   logiccloud orchestrate: MCP server https://mcp.DOMAIN/mcp, skills for lco
   --agents LIST          comma-separated: claude,codex,opencode (default: those installed)
-  --no-login             do not start the control OAuth login for Codex and opencode
+  --no-login             do not start the OAuth logins for Codex and opencode
   --remove               remove what setup.sh installed (with --control/--orchestrate: only that)
   --dry-run              only print what would be done
   -h, --help             this help
 
-The orchestrate API key: Claude Code keeps it in its secure storage (asked here,
-or taken from \$$KEY_VAR); Codex and opencode read \$$KEY_VAR when they start.
+Both servers log the user in with OAuth; an orchestrate API key instead goes
+into the X-API-Key header by hand (README.md).
 
 Environment: AGENT_KIT_SOURCE (default $REPO, or a local checkout),
 AGENT_KIT_REF (default main).
@@ -113,17 +113,6 @@ ask() { # ask PROMPT -> answer on stdout ("" without a terminal)
 	printf '%s' "$a"
 }
 
-ask_secret() {
-	local a=
-	tty_ok || return 0
-	stty -echo </dev/tty 2>/dev/null || true # before the prompt, or early typing shows
-	printf '%s' "$1" >/dev/tty
-	IFS= read -r a </dev/tty || true
-	stty echo </dev/tty 2>/dev/null || true
-	printf '\n' >/dev/tty
-	printf '%s' "$a"
-}
-
 json_str() { # a JSON string literal
 	local s=$1
 	s=${s//\\/\\\\}
@@ -153,13 +142,6 @@ for a in "${AGENT_LIST[@]}"; do
 done
 
 local_source() { [[ -d $SOURCE ]]; }
-
-# The orchestrate API key, for Claude Code (the others read $LCO_API_KEY).
-API_KEY=${!KEY_VAR:-}
-want_key() {
-	[[ -n $API_KEY || -n $DRY ]] && return 0
-	API_KEY=$(ask_secret "orchestrate API key (Settings > Security > API Keys; empty: set it later): ")
-}
 
 # ---------------------------------------------------------------- Claude Code
 
@@ -191,16 +173,9 @@ claude_setup() {
 		else
 			run claude plugin install "orchestrate@$MARKETPLACE" --config "domain=$ORCH"
 		fi
-		want_key
-		if [[ -n $API_KEY ]]; then
-			say "+ claude plugin configure orchestrate@$MARKETPLACE --values-stdin   # api_key (secure storage)"
-			[[ -n $DRY ]] || printf '{"api_key":%s}' "$(json_str "$API_KEY")" |
-				claude plugin configure "orchestrate@$MARKETPLACE" --values-stdin >/dev/null
-		else
-			NOTES+=("Claude Code: set the orchestrate API key with /plugin configure orchestrate@$MARKETPLACE")
-		fi
 	fi
 	[[ -z $CONTROL ]] || NOTES+=("Claude Code: log in to logiccloud control with /mcp (server plugin:control:$CONTROL_SERVER)")
+	[[ -z $ORCH ]] || NOTES+=("Claude Code: log in to logiccloud orchestrate with /mcp (server plugin:orchestrate:$ORCH_SERVER)")
 }
 
 claude_remove() {
@@ -254,7 +229,11 @@ callback_url = \"http://localhost:$CALLBACK_PORT/callback\"
 		block+="
 [mcp_servers.$ORCH_SERVER]
 url = \"https://mcp.$ORCH/mcp\"
-env_http_headers = { \"X-API-Key\" = \"$KEY_VAR\" }
+scopes = [\"${SCOPES// /\", \"}\"]
+
+[mcp_servers.$ORCH_SERVER.oauth]
+client_id = \"$ORCH_CLIENT_ID\"
+callback_url = \"http://localhost:$CALLBACK_PORT/callback\"
 "
 	fi
 	local s
@@ -267,15 +246,17 @@ env_http_headers = { \"X-API-Key\" = \"$KEY_VAR\" }
 		mkdir -p "$(dirname "$CODEX_CONFIG")"
 		printf '%s' "$block" >>"$CODEX_CONFIG"
 	fi
-	[[ -z $ORCH ]] || NOTES+=("Codex: export $KEY_VAR=<orchestrate API key> in the shell that starts codex")
-	if [[ -n $CONTROL ]]; then
-		if [[ -n $LOGIN && -z $DRY ]] && tty_ok; then
-			say "+ codex mcp login $CONTROL_SERVER"
-			codex mcp login "$CONTROL_SERVER" </dev/tty 2>&1 | grep -v -E 'UNDICI|trace-warnings|PATH aliases' ||
-				NOTES+=("Codex: log in to logiccloud control with: codex mcp login $CONTROL_SERVER")
-		else
-			NOTES+=("Codex: log in to logiccloud control with: codex mcp login $CONTROL_SERVER")
-		fi
+	[[ -z $CONTROL ]] || codex_login "$CONTROL_SERVER" control
+	[[ -z $ORCH ]] || codex_login "$ORCH_SERVER" orchestrate
+}
+
+codex_login() { # SERVER PRODUCT
+	if [[ -n $LOGIN && -z $DRY ]] && tty_ok; then
+		say "+ codex mcp login $1"
+		codex mcp login "$1" </dev/tty 2>&1 | grep -v -E 'UNDICI|trace-warnings|PATH aliases' ||
+			NOTES+=("Codex: log in to logiccloud $2 with: codex mcp login $1")
+	else
+		NOTES+=("Codex: log in to logiccloud $2 with: codex mcp login $1")
 	fi
 }
 
@@ -379,18 +360,21 @@ opencode_setup() {
 	fi
 	if [[ -n $ORCH ]]; then
 		opencode_json "MCP server $ORCH_SERVER" \
-			--arg name "$ORCH_SERVER" --arg url "https://mcp.$ORCH/mcp" --arg key "{env:$KEY_VAR}" \
-			'.mcp[$name] = {type: "remote", url: $url, headers: {"X-API-Key": $key}, oauth: false}'
-		NOTES+=("opencode: export $KEY_VAR=<orchestrate API key> in the shell that starts opencode")
+			--arg name "$ORCH_SERVER" --arg url "https://mcp.$ORCH/mcp" --arg client "$ORCH_CLIENT_ID" \
+			--arg redirect "http://localhost:$CALLBACK_PORT/callback" --arg scope "$SCOPES" \
+			'.mcp[$name] = {type: "remote", url: $url, oauth: {clientId: $client, redirectUri: $redirect, scope: $scope}}'
 	fi
-	if [[ -n $CONTROL ]]; then
-		if [[ -n $LOGIN && -z $DRY ]] && tty_ok; then
-			say "+ opencode mcp auth $CONTROL_SERVER"
-			opencode mcp auth "$CONTROL_SERVER" </dev/tty ||
-				NOTES+=("opencode: log in to logiccloud control with: opencode mcp auth $CONTROL_SERVER")
-		else
-			NOTES+=("opencode: log in to logiccloud control with: opencode mcp auth $CONTROL_SERVER")
-		fi
+	[[ -z $CONTROL ]] || opencode_login "$CONTROL_SERVER" control
+	[[ -z $ORCH ]] || opencode_login "$ORCH_SERVER" orchestrate
+}
+
+opencode_login() { # SERVER PRODUCT
+	if [[ -n $LOGIN && -z $DRY ]] && tty_ok; then
+		say "+ opencode mcp auth $1"
+		opencode mcp auth "$1" </dev/tty ||
+			NOTES+=("opencode: log in to logiccloud $2 with: opencode mcp auth $1")
+	else
+		NOTES+=("opencode: log in to logiccloud $2 with: opencode mcp auth $1")
 	fi
 }
 
@@ -419,7 +403,7 @@ fi
 
 say "Setting up for: ${AGENT_LIST[*]}"
 [[ -z $CONTROL ]] || say "  control      https://mcp.$CONTROL/mcp (login https://auth.$CONTROL)"
-[[ -z $ORCH ]] || say "  orchestrate  https://mcp.$ORCH/mcp (API key)"
+[[ -z $ORCH ]] || say "  orchestrate  https://mcp.$ORCH/mcp (login https://keycloak.$ORCH)"
 for a in "${AGENT_LIST[@]}"; do "${a}_setup"; done
 
 say ""

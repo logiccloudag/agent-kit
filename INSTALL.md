@@ -12,17 +12,19 @@ everything else is derived from it:
 - **control** (PLC projects, `lc`): e.g. `logiccloud.example.com`. The MCP server is
   `https://mcp.<domain>/mcp`; the login is OAuth at `https://auth.<domain>`.
 - **orchestrate** (edge devices, `lco`): e.g. `orchestrate.example.com`.
-  The MCP server is `https://mcp.<domain>/mcp`; it needs an API key.
+  The MCP server is `https://mcp.<domain>/mcp`; the login is OAuth at
+  `https://keycloak.<domain>`.
 
 If the user did not say which domains, ask them. A URL they copied from the
 browser is fine (`https://logiccloud.example.com/projects` means `logiccloud.example.com`).
 Set up only the products they want.
 
-## 2. Never handle the API key yourself
+## 2. Never handle credentials yourself
 
-Do not ask the user to paste the orchestrate API key into the chat, and do not
-write it into any file. Either the user enters it in their own terminal (step
-3), or it is already in their environment as `LCO_API_KEY`.
+Both products log the user in with OAuth in the browser. Do not ask the user
+for a password or an API key in the chat, and do not write one into any file.
+If the user wants an orchestrate API key instead of the login, they put it in
+their agent's configuration themselves (README, "With an orchestrate API key").
 
 ## 3. Run setup.sh (macOS, Linux, WSL)
 
@@ -41,26 +43,26 @@ It sets up every agent it finds: Claude Code (plugins from the marketplace
 `--dry-run` first if the user wants to see the changes. It is safe to run
 again.
 
-You have no terminal for the user's input, so the script cannot ask for the
-API key or open the login. At the end it prints "Still to do"; pass every line
-of that on to the user. Typically:
+You have no terminal for the user's input, so the script cannot open the
+logins. At the end it prints "Still to do"; pass every line of that on to the
+user. Typically:
 
-- Claude Code: `/plugin configure orchestrate@logiccloud` to enter the API key,
-  and `/mcp` → `plugin:control:logiccloud-control` to log in.
-- Codex: `codex mcp login logiccloud-control`; start Codex with `LCO_API_KEY`
-  set.
-- opencode: `opencode mcp auth logiccloud-control`; start opencode with
-  `LCO_API_KEY` set.
+- Claude Code: `/mcp` → `plugin:control:logiccloud-control` and
+  `plugin:orchestrate:logiccloud-orchestrate` to log in.
+- Codex: `codex mcp login logiccloud-control` and
+  `codex mcp login logiccloud-orchestrate`.
+- opencode: `opencode mcp auth logiccloud-control` and
+  `opencode mcp auth logiccloud-orchestrate`.
 
 Alternatively the user can run the command above in their own terminal without
-`--no-login`; then the script asks for the key and opens the logins itself.
+`--no-login`; then the script opens the logins itself.
 
 ## 4. Without bash (Windows)
 
 - **Claude Code**: run `claude plugin marketplace add logiccloudag/agent-kit`,
   then `claude plugin install control@logiccloud --config domain=<control domain>`
   and `claude plugin install orchestrate@logiccloud --config domain=<orchestrate domain>`.
-  The user enters the API key with `/plugin configure orchestrate@logiccloud`.
+  The user logs in with `/mcp`.
 - **Codex**: `codex plugin marketplace add logiccloudag/agent-kit`,
   `codex plugin add control@logiccloud`, `codex plugin add orchestrate@logiccloud`,
   then add the `[mcp_servers...]` entries from the README's Codex section to
@@ -87,10 +89,12 @@ documentation on MCP servers and skills:
      Use this client rather than dynamic client registration. If your client
      can only use another redirect URI, tell the user: an administrator has to
      allow it for `lc-mcp` in Keycloak.
-   - `logiccloud-orchestrate`: `https://mcp.<orchestrate domain>/mcp`, no
-     OAuth; every request sends the header `X-API-Key: <API key>`. Take the key
-     from the environment variable `LCO_API_KEY` if your configuration can
-     reference one; otherwise tell the user where to enter it.
+   - `logiccloud-orchestrate`: `https://mcp.<orchestrate domain>/mcp`, the
+     same way with the public client `lco-mcp` (redirect
+     `http://localhost:33418/callback`, the same scopes); the authorization
+     server is `https://keycloak.<orchestrate domain>/realms/fleet-manager`.
+     If the user prefers an API key, the server also takes the header
+     `X-API-Key: <API key>` instead; tell the user where to enter it.
 2. Install the skills: download https://github.com/logiccloudag/agent-kit
    (`https://codeload.github.com/logiccloudag/agent-kit/tar.gz/main`) and copy
    the folders under `plugins/control/skills/` and
@@ -98,8 +102,7 @@ documentation on MCP servers and skills:
    skills from (often `~/.agents/skills/`). If you have no skills, put a short
    note into your instructions file that the skills exist, and read the
    `SKILL.md` files when the user works with logiccloud.
-3. Tell the user how to log in to the control server with you, and to restart
-   you.
+3. Tell the user how to log in to both servers with you, and to restart you.
 
 ## 5. The command line tools (optional)
 
@@ -115,5 +118,5 @@ interactive).
 Agents load new plugins, skills and servers only when they start, so ask the
 user to restart theirs. After that, `claude mcp list`, `codex mcp list` or
 `opencode mcp list` show the servers `logiccloud-control` and
-`logiccloud-orchestrate`. A control server that says it needs authentication
-just needs the login from step 3.
+`logiccloud-orchestrate`. A server that says it needs authentication just
+needs the login from step 3.

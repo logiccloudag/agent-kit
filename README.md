@@ -9,7 +9,7 @@ tools.
 |---|---|---|
 | What | PLC projects in IEC 61131-3 Structured Text, cloud builds, HMI pages, devices, runtimes and connections | Edge devices (Margo), logs, telemetry, the application catalog and rollouts |
 | MCP server | `https://mcp.<domain>/mcp` | `https://mcp.<domain>/mcp` |
-| Login | OAuth at `https://auth.<domain>` (Keycloak client `lc-mcp`) | API key (orchestrate: Settings > Security > API Keys) |
+| Login | OAuth at `https://auth.<domain>` (Keycloak client `lc-mcp`) | OAuth at `https://keycloak.<domain>` (Keycloak client `lco-mcp`), or an API key |
 | CLI | `lc` | `lco` |
 | Skills | `logiccloud`, `logiccloud-hmi`, `logiccloud-devices` | `logiccloud-orchestrate`, `logiccloud-orchestrate-deployments` |
 | Plugin | `control@logiccloud` | `orchestrate@logiccloud` |
@@ -18,7 +18,8 @@ Every installation of logiccloud runs on its own domain, and everything else
 follows from it. You only need the **root domain** of each product, e.g.
 `logiccloud.example.com` (control) and `orchestrate.example.com`
 (orchestrate); the examples below use these placeholders. The MCP server is
-always on the `mcp.` subdomain, the login on `auth.`.
+always on the `mcp.` subdomain, the login on `auth.` (control) or `keycloak.`
+(orchestrate).
 
 ## Quick start
 
@@ -31,9 +32,8 @@ curl -fsSL https://raw.githubusercontent.com/logiccloudag/agent-kit/main/setup.s
 
 Use your installation's domains, and leave out the product you don't use.
 Without options the script asks for both. It sets up every agent it finds
-(`--agents claude,codex` limits that), asks for the orchestrate API key when
-Claude Code is one of them, starts the control login for Codex and opencode,
-and prints what is left to do. Run it again to update or to change a domain;
+(`--agents claude,codex` limits that), starts the logins for Codex and
+opencode, and prints what is left to do. Run it again to update or to change a domain;
 `--remove` takes everything out again; `--dry-run` only shows what it would do.
 
 ### Or let your agent do it
@@ -44,8 +44,8 @@ Paste this into your agent, with your domains:
 > https://github.com/logiccloudag/agent-kit/blob/main/INSTALL.md —
 > control domain: `logiccloud.example.com`, orchestrate domain: `orchestrate.example.com`
 
-The agent follows [INSTALL.md](INSTALL.md). It will not ask for the API key in
-the chat; you enter it yourself.
+The agent follows [INSTALL.md](INSTALL.md). You log in yourself, in the
+browser; the agent never sees a password or key.
 
 ## Claude Code
 
@@ -57,16 +57,19 @@ Inside Claude Code, without the script:
 /plugin install orchestrate@logiccloud
 ```
 
-Claude Code asks for the domain (and for orchestrate the API key, which it keeps
-in the system's secure storage). Then `/mcp` and pick
-`plugin:control:logiccloud-control` to log in. From a shell, the same is:
+Claude Code asks for the domain. Then `/mcp` and pick
+`plugin:control:logiccloud-control` and `plugin:orchestrate:logiccloud-orchestrate`
+to log in. From a shell, the same is:
 
 ```sh
 claude plugin marketplace add logiccloudag/agent-kit
 claude plugin install control@logiccloud --config domain=logiccloud.example.com
 claude plugin install orchestrate@logiccloud --config domain=orchestrate.example.com
-echo '{"api_key":"<key>"}' | claude plugin configure orchestrate@logiccloud --values-stdin
 ```
+
+To use an orchestrate API key (Settings > Security > API Keys) instead of the
+login, add the server yourself rather than through the plugin:
+`claude mcp add --transport http logiccloud-orchestrate https://mcp.orchestrate.example.com/mcp --header "X-API-Key: <key>"`.
 
 `/plugin configure control@logiccloud` changes the domain later. The plugins
 update with `/plugin marketplace update logiccloud`.
@@ -95,12 +98,18 @@ callback_url = "http://localhost:33418/callback"
 
 [mcp_servers.logiccloud-orchestrate]
 url = "https://mcp.orchestrate.example.com/mcp"
-env_http_headers = { "X-API-Key" = "LCO_API_KEY" }
+scopes = ["openid", "profile", "email", "offline_access"]
+
+[mcp_servers.logiccloud-orchestrate.oauth]
+client_id = "lco-mcp"
+callback_url = "http://localhost:33418/callback"
 ```
 
-Then `codex mcp login logiccloud-control`, and start Codex with the API key in
-`LCO_API_KEY` (e.g. `export LCO_API_KEY=...` in your shell profile). The
-`scopes` matter: without them Codex asks Keycloak for every scope the realm
+Then `codex mcp login logiccloud-control` and `codex mcp login
+logiccloud-orchestrate`. (With an orchestrate API key instead, replace the
+orchestrate entry's `scopes` and `oauth` with
+`env_http_headers = { "X-API-Key" = "LCO_API_KEY" }` and start Codex with
+`LCO_API_KEY` set.) The `scopes` matter: without them Codex asks Keycloak for every scope the realm
 offers, and Keycloak refuses the login.
 
 ## opencode
@@ -125,25 +134,31 @@ adds the servers to `~/.config/opencode/opencode.json`:
     "logiccloud-orchestrate": {
       "type": "remote",
       "url": "https://mcp.orchestrate.example.com/mcp",
-      "headers": { "X-API-Key": "{env:LCO_API_KEY}" },
-      "oauth": false
+      "oauth": {
+        "clientId": "lco-mcp",
+        "redirectUri": "http://localhost:33418/callback",
+        "scope": "openid profile email offline_access"
+      }
     }
   }
 }
 ```
 
-Then `opencode mcp auth logiccloud-control`, and start opencode with
-`LCO_API_KEY` set. To copy the skills by hand, take the folders under
+Then `opencode mcp auth logiccloud-control` and `opencode mcp auth
+logiccloud-orchestrate`. (With an orchestrate API key instead:
+`"headers": { "X-API-Key": "{env:LCO_API_KEY}" }, "oauth": false`, and start
+opencode with `LCO_API_KEY` set.) To copy the skills by hand, take the folders under
 `plugins/*/skills/` into `~/.config/opencode/skills/` (or `~/.agents/skills/`).
 
 ## Other agents
 
 Any agent that speaks MCP over streamable HTTP works: point it at
-`https://mcp.<domain>/mcp`. For control it needs OAuth with the client ID
-`lc-mcp`, the redirect `http://localhost:33418/callback` (the Keycloak client
-allows `localhost:<port>/callback` for the ports it was set up with, 33418 by
-default) and the scopes `openid profile email offline_access`; for
-orchestrate the header `X-API-Key: <key>`. Agents that read `SKILL.md`
+`https://mcp.<domain>/mcp`. Both need OAuth with the redirect
+`http://localhost:33418/callback` (the Keycloak clients allow
+`localhost:<port>/callback` for the ports they were set up with, 33418 by
+default) and the scopes `openid profile email offline_access`; the client ID
+is `lc-mcp` for control and `lco-mcp` for orchestrate. Orchestrate also takes
+the header `X-API-Key: <key>` instead. Agents that read `SKILL.md`
 folders can use `plugins/*/skills/` as they are.
 
 Or paste this into the agent and let it configure itself:
@@ -153,7 +168,7 @@ Or paste this into the agent and let it configure itself:
 > Control domain: `logiccloud.example.com`, orchestrate domain:
 > `orchestrate.example.com`. Add both MCP servers to your own MCP
 > configuration and install the skills from the repository where you load
-> skills from. Don't ask me for the API key in the chat; tell me where to put it.
+> skills from. Don't ask me for passwords or keys in the chat; tell me how to log in.
 
 ## Command line tools
 
@@ -166,7 +181,7 @@ repository. Put the binaries on your `PATH`, then log in once per machine:
 
 ```sh
 lc login -domain logiccloud.example.com                  # browser login at auth.<domain>
-lco login -domain orchestrate.example.com   # paste an API key
+lco login -domain orchestrate.example.com                 # browser login at keycloak.<domain> (or -api-key)
 ```
 
 `lc` and `lco` take their skills from this repository: `lc pull` and

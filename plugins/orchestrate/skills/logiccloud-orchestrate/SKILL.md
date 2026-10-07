@@ -10,17 +10,21 @@ applications to them, among them the logiccloud Control runtime. It is not
 logiccloud control: `lc` and the `logiccloud-control` server edit and build
 PLC projects; orchestrate manages devices and what runs on them.
 
-There are two ways in, and both use an API key. Use whichever is there:
+There are two ways in. Both act as the logged-in user (OAuth) or with an
+API key. Use whichever is there:
 
-- **The `lco` CLI.** If it says there is no API key, ask the user to run
-  `lco login -domain <domain>` (the root domain of their orchestrate
-  installation) or to set `LCO_API_KEY`.
-- **The MCP server `logiccloud-orchestrate`.** The key is set where the
-  server is configured. A 401 means it is missing or wrong; ask the user to
-  fix it in their agent's configuration.
+- **The `lco` CLI.** If it says it is not logged in, or the login expired,
+  ask the user to run `lco login -domain <domain>` (the root domain of their
+  orchestrate installation; it opens the browser), or `lco login -api-key`,
+  or to set `LCO_API_KEY`.
+- **The MCP server `logiccloud-orchestrate`.** The user logs in through
+  their agent (Claude Code: `/mcp`), or an API key is set where the server
+  is configured. A 401 means the login is missing or expired, or the key is
+  wrong; ask the user to log in again or fix the key.
 
-A 403 names the permission the key lacks (e.g. `telemetry:read`,
-`fleet:read`). Tell the user; do not look for another key.
+Never ask for a password or a key in the chat. A 403 names the permission
+the user or key lacks (e.g. `telemetry:read`, `fleet:read`). Tell the user;
+do not look for other credentials.
 
 ## Look around
 

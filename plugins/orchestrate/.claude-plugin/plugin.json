@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "orchestrate",
   "displayName": "logiccloud orchestrate",
-  "version": "1.1.0",
-  "description": "Manage edge devices and roll out applications with logiccloud orchestrate (formerly Fleet Manager): the orchestrate MCP server (API key) and skills for the lco CLI.",
+  "version": "1.2.0",
+  "description": "Manage edge devices and roll out applications with logiccloud orchestrate (formerly Fleet Manager): the orchestrate MCP server (OAuth login) and skills for the lco CLI.",
   "author": {
     "name": "logiccloud AG",
     "url": "https://logiccloud.com"
@@ -24,23 +24,18 @@
     "domain": {
       "type": "string",
       "title": "orchestrate domain",
-      "description": "Root domain of your orchestrate installation, without https:// (e.g. orchestrate.example.com). The MCP server is https://mcp.<domain>/mcp.",
+      "description": "Root domain of your orchestrate installation, without https:// (e.g. orchestrate.example.com). The MCP server is https://mcp.<domain>/mcp, the login https://keycloak.<domain>.",
       "required": true
-    },
-    "api_key": {
-      "type": "string",
-      "title": "orchestrate API key",
-      "description": "An API key from orchestrate (Settings > Security > API Keys). Its scopes decide what the agent may do.",
-      "required": true,
-      "sensitive": true
     }
   },
   "mcpServers": {
     "logiccloud-orchestrate": {
       "type": "http",
       "url": "https://mcp.${user_config.domain}/mcp",
-      "headers": {
-        "X-API-Key": "${user_config.api_key}"
+      "oauth": {
+        "clientId": "lco-mcp",
+        "callbackPort": 33418,
+        "scopes": "openid profile email offline_access"
       }
     }
   }
