@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "control",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Write, build and deploy IEC 61131-3 PLC projects and HMI pages in logiccloud control: the logiccloud MCP server (OAuth login) and skills for the lc CLI.",
   "author": {
     "name": "logiccloud AG",

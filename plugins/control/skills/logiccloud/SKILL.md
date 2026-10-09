@@ -1,6 +1,6 @@
 ---
 name: logiccloud
-description: Use when working on a logiccloud PLC project - finding, creating or pulling a project, writing IEC 61131-3 Structured Text, building it in the cloud, tasks and program configurations, Inputs/Outputs pragmas, libraries. Covers both the lc CLI and the logiccloud MCP server (logiccloud-control).
+description: Use when working on a logiccloud PLC project - finding, creating or pulling a project, writing IEC 61131-3 Structured Text, building it in the cloud (and finding failed builds), tasks and program configurations, Inputs/Outputs pragmas, libraries, or anything else in the logiccloud GraphQL API (schema lookup, raw queries). Covers both the lc CLI and the logiccloud MCP server (logiccloud-control).
 ---
 
 # logiccloud projects
@@ -29,14 +29,15 @@ control.
 | Get the sources | `lc pull <projectId>` in an empty directory | `list_files`, `read_files` |
 | Change and build | edit the files, then `lc check` | `write_files` with `build: true` |
 | Only build | `lc build` | `build` |
+| Earlier builds (e.g. the failed ones) | `lc builds -project <id> -status failed` | `list_builds` (`statuses`) |
 | Libraries | `lc libraries`, `lc library add/remove <name>` | `list_libraries`, `add_library`, `remove_library` |
-| Anything else | `lc query '<GraphQL>'` | `graphql` |
 
 Paths are the same both ways: `pous/<folders>/<Name>.st` (one PROGRAM,
 FUNCTION_BLOCK or FUNCTION per file, file name = POU name),
 `dataTypes/<Name>.st`, `globalVariables/<Name>.st`,
 `configuration/<Name>.json` (tasks and program configurations),
-`libraries/...` (read-only) and `hmi/<Name>.page.json`. The full rules
+`alarming/<Name>.json` (alarm settings), `libraries/...` (read-only) and
+`hmi/<Name>.page.json`. The full rules
 (layout, pragmas, configuration format, HMI format) are in the workspace's
 AGENTS.md (CLAUDE.md for Claude Code) with `lc`, and in the MCP server's
 instructions with the tools. Read them before editing, and follow them.
@@ -72,5 +73,27 @@ instructions with the tools. Read them before editing, and follow them.
   delete files, or delete a project or runtime (`lc project delete`,
   `lc runtime delete`, `delete_project`, `delete_runtime`).
 
-For HMI pages use the logiccloud-hmi skill; for devices, deploying, logs and
-connections the logiccloud-devices skill.
+## Anything else: the GraphQL API
+
+Use the commands and tools above where they fit. For anything else, run a
+raw query, but look the names up first instead of guessing them:
+
+| Task | lc | MCP tool |
+|---|---|---|
+| Find fields, types, enum values by words | `lc schema -search "modbus unit"` | `search_schema` |
+| One type or root field: arguments, input types, enums | `lc schema -type Mutation.createRuntime` | `describe_schema` |
+| Run a query or mutation | `lc query '<GraphQL>'` (`-vars '{...}'`, or `@file`) | `graphql` (`variables`) |
+
+An error about an unknown field, argument or type names the type to look
+at: describe it and fix the query. A mutation changes the shared
+organization: only for what the user asked.
+
+## Other skills
+
+- logiccloud-hmi: HMI pages.
+- logiccloud-devices: deploying, starting and stopping runtimes, health,
+  logs, live variable values, device maintenance actions.
+- logiccloud-connections: MQTT, Modbus, OPC UA and other connections and
+  their variable mappings.
+- logiccloud-alarms: alarm settings, acknowledging or shelving alarms on a
+  device, alarm e-mail notifications.

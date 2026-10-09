@@ -13,6 +13,9 @@ This directory is a local checkout of a logiccloud PLC project, synced with the
   via `VAR_EXTERNAL`.
 - `configuration/<Name>.json` — tasks, program configurations and config
   variables (see below).
+- `alarming/<Name>.json` — the project's alarm settings, if it has any, e.g.
+  `{"enabled": true, "maxAlarms": 100, "maxHistory": 500}`. The alarms
+  themselves are ST (`ST_Alarm` values passed to `RPC_CALL('alarm', 'set', ...)`).
 - `libraries/<Library>/...` — sources of the libraries the project uses,
   read-only. Their function blocks and functions can be used directly.
 - `.lc.json` — sync state. Do not edit it.
@@ -196,6 +199,15 @@ belong to a runtime, not to this directory:
     lc connection <id>                    # settings, units/payloads/subscriptions, mappings
     lc connection <id> -definition > c.json   # edit it, then:
     lc connection update <id> -f c.json   # replaces the whole connection
+    lc connection copy <id> -runtime <id> -name <n>   # with sub-objects and mappings
+
+Most types keep their mappings outside the definition, in sub-objects
+(`lc connection object`) or lists (`lc connection mappings`); `lc connection
+types` says which.
+
+Live values of the running program: `lc vars -device <id>` (read-only);
+`lc write -device <id> <variable> <value>` changes a running machine, so only
+when the user asks for it.
 
 `lc connection delete` and `lc runtime delete`/`lc project delete` want the
 object's name with `-name`, and delete for good. Only for what the user asked.

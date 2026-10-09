@@ -7,13 +7,13 @@
     {
       "name": "control",
       "source": "./plugins/control",
-      "description": "logiccloud control: PLC projects in Structured Text, cloud builds, HMI pages, devices and connections (MCP server with OAuth, lc skills).",
+      "description": "logiccloud control: PLC projects in Structured Text, cloud builds, HMI pages, devices, connections and alarms (MCP server with OAuth, lc skills).",
       "category": "development"
     },
     {
       "name": "orchestrate",
       "source": "./plugins/orchestrate",
-      "description": "logiccloud orchestrate: edge devices, logs, telemetry and application rollouts (MCP server with OAuth, lco skills).",
+      "description": "logiccloud orchestrate: edge devices, labels and groups, logs, telemetry, application rollouts and alerts (MCP server with OAuth, lco skills).",
       "category": "development"
     }
   ]

@@ -7,11 +7,11 @@ tools.
 
 | | logiccloud control | logiccloud orchestrate |
 |---|---|---|
-| What | PLC projects in IEC 61131-3 Structured Text, cloud builds, HMI pages, devices, runtimes and connections | Edge devices (Margo), logs, telemetry, the application catalog and rollouts |
+| What | PLC projects in IEC 61131-3 Structured Text, cloud builds, HMI pages, devices, runtimes, connections and alarms | Edge devices (Margo), labels and groups, logs, telemetry, the application catalog, rollouts and alerts |
 | MCP server | `https://mcp.<domain>/mcp` | `https://mcp.<domain>/mcp` |
 | Login | OAuth at `https://auth.<domain>` (Keycloak client `lc-mcp`) | OAuth at `https://keycloak.<domain>` (Keycloak client `lco-mcp`), or an API key |
 | CLI | `lc` | `lco` |
-| Skills | `logiccloud`, `logiccloud-hmi`, `logiccloud-devices` | `logiccloud-orchestrate`, `logiccloud-orchestrate-deployments` |
+| Skills | `logiccloud`, `logiccloud-hmi`, `logiccloud-devices`, `logiccloud-connections`, `logiccloud-alarms` | `logiccloud-orchestrate`, `logiccloud-orchestrate-deployments`, `logiccloud-orchestrate-alerts` |
 | Plugin | `control@logiccloud` | `orchestrate@logiccloud` |
 
 Every installation of logiccloud runs on its own domain, and everything else
