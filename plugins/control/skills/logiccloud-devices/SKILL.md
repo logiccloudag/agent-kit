@@ -23,36 +23,35 @@ skill, alarms in logiccloud-alarms.
 | Runtimes with their device and state | `lc runtimes -project <id> -status started` (`-platform`, `-tag`) | `list_runtimes` (`states`, `platforms`, `tags`) |
 | One runtime: build, state on the device, pending changes, connections | `lc runtime <id>` | `get_runtime` |
 
-## Platforms and device types
+## Platforms
 
 A build runs only on the platforms it was built for, and `lc deploy` /
 `deploy` refuses a build without the device's exact platform (`lc devices`
 shows it): `Amd64` for cloud vPLCs (the `lc init` default), `x86_64` for
-edge PCs, `Arm64`, `Arm/V7`. Build for others with
+edge PCs (Generic X86/64, Windows, industrial PCs), `Arm64` (Raspberry Pi,
+RevPi, most gateways), `Arm/V7`. Build for others with
 `lc build -platform x86_64` (several: `-platform Amd64,Arm64`;
-`build` with `platforms`). Physical devices are added in the portal and set
-up on the device by the user; `lc` only creates cloud vPLCs.
+`build` with `platforms`).
 
-What is specific to a device type (setup, license, HMI path, its I/O) is in
-its skill:
+## Edge devices
 
-| Device types | Skill |
-|---|---|
-| vPLC Cloud Development, S1-S4 | logiccloud-device-vplc |
-| Kubernetes vPLC S1 | logiccloud-device-kubernetes |
-| Generic ARM 64 / ARM v7 / X86/64, Hilscher netFIELD and sensorEDGE, Kontron, FESTO, NXTGN | logiccloud-device-linux |
-| Windows 10/11, Windows Server | logiccloud-device-windows |
-| Raspberry Pi 4B, 5, Cluster | logiccloud-device-raspberry-pi |
-| KUNBUS Revolution Pi | logiccloud-device-revpi |
-| Weidmüller UC20 (u-OS) | logiccloud-device-weidmueller |
-| Bosch Rexroth ctrlX CORE | logiccloud-device-ctrlx |
-| Phoenix Contact PLCnext | logiccloud-device-plcnext |
-| WAGO CC100 | logiccloud-device-wago |
-| Murrelektronik Xelity | logiccloud-device-murrelektronik |
-| INSYS icom MRX | logiccloud-device-insys-mrx |
-| Perinet periMICA | logiccloud-device-perimica |
-| IXON SecureEdge Pro | logiccloud-device-ixon |
-| Hirschmann/Belden OpEdge | logiccloud-device-opedge |
+`lc` only creates cloud vPLCs. A physical device is added in the portal
+("bind device" gives a device token) and set up on the device by the user:
+most types run the logiccloud control container (`logiccloud/logiccloud-control`
+on Docker Hub, Docker or Podman, a volume on `/app/storage`, the device web
+UI on port 8080, where the token is entered). Afterwards `lc devices` shows
+it with a `LAST SEEN` time. Serial ports (Modbus RTU) must be passed into
+the container when it is installed. A runtime without a license runs in
+demo mode and stops after two hours; the key is assigned in the portal and
+the device's license service activates it.
+
+Device types with their own setup, license or I/O have a skill:
+logiccloud-device-vplc (cloud vPLCs), -kubernetes (Kubernetes vPLC),
+-ctrlx (Bosch Rexroth ctrlX CORE), -plcnext (Phoenix Contact PLCnext),
+-wago (WAGO CC100), -weidmueller (Weidmüller u-control), -insys-mrx (INSYS
+icom MRX), -perimica (Perinet periMICA). Raspberry Pi GPIO and Revolution
+Pi I/O are in logiccloud-connection-raspberry-pi and -revpi. All other
+devices are plain Docker hosts: use the network connections.
 
 ## Deploy and run
 

@@ -6,9 +6,15 @@ description: Use when a logiccloud runtime on a KUNBUS Revolution Pi should read
 # Revolution Pi connections
 
 The commands and general rules are in the logiccloud-connections skill; this
-adds what is specific to type `Revpi`. The device side is in the
-logiccloud-device-revpi skill. Test: not supported; check with `lc vars`
-and the runtime log.
+adds what is specific to type `Revpi`, for the KUNBUS Revolution Pi device
+types (Connect 4/5/S, Core S, Flat S; platform `Arm64`). Test: not
+supported; check with `lc vars` and the runtime log.
+
+With a `Revpi` connection, the deploy also installs a RevPi connector
+process on the device (`lc health` lists it; its log with
+`lc logs -device <id> -target <process>`). The device's RevPi browsing
+service reads the PiCtory configuration, so the portal can list the signal
+names.
 
 ## Definition
 

@@ -6,8 +6,8 @@ description: Use when a logiccloud runtime on a Raspberry Pi should read or swit
 # Raspberry Pi GPIO connections
 
 The commands and general rules are in the logiccloud-connections skill; this
-adds what is specific to type `RaspberryPi`. The device side is in the
-logiccloud-device-raspberry-pi skill. Test: supported.
+adds what is specific to type `RaspberryPi` (device types Raspberry Pi 4B,
+5 and Cluster, platform `Arm64`, 64-bit Raspberry Pi OS). Test: supported.
 
 ## Definition and mappings
 

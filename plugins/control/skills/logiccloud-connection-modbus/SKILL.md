@@ -17,8 +17,9 @@ and `lc vars` (logiccloud-devices skill).
    - RTU (`ModbusRtuConnectionInput`): `baudRate` (`BaudRate9600`,
      `BaudRate19200`, `BaudRate115200`, ...), `dataBits` (`Seven`, `Eight`),
      `stopBits` (`One`, `Two`), `parity` (`None`, `Even`, `Odd`). The serial
-     port itself is not part of the definition; the device must pass it to the
-     runtime (logiccloud device skills).
+     port itself is not part of the definition: it must be passed into the
+     runtime's container when the device is set up (on a Raspberry Pi,
+     enable the serial port with `raspi-config` first).
    - Both, optional: `pollPeriod` (ms, 500), `waitBetweenCalls` (10),
      `connectTimeout` (3000), `requestTimeout`, `readChunkSize`/`writeChunkSize`
      (1), `useReadMultiple`/`useWriteMultiple` (false; turn on if the device

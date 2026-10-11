@@ -7,7 +7,7 @@ description: Use when a logiccloud project should run on a WAGO controller (Comp
 
 Device type CC 100, platform `Arm/V7`. The type installs an extra process,
 the **WAGO CC100 connector**, which links the onboard I/O to the runtime.
-A PFC200 runs as a Generic ARM v7 device (logiccloud-device-linux skill).
+A PFC200 runs as a Generic ARM v7 device.
 
 ## Onboarding (the user does it)
 
@@ -17,7 +17,7 @@ A PFC200 runs as a Generic ARM v7 device (logiccloud-device-linux skill).
    controller reaches the internet.
 2. Add and bind the device in the logiccloud portal (type CC 100), then run
    the install script on the controller and connect it with the device
-   token (logiccloud-device-linux skill).
+   token (logiccloud-devices skill).
 
 ## Deploying
 
