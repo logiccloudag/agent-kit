@@ -93,7 +93,10 @@ organization: only for what the user asked.
 - logiccloud-hmi: HMI pages.
 - logiccloud-devices: deploying, starting and stopping runtimes, health,
   logs, live variable values, device maintenance actions.
+- logiccloud-device-*: one per device family (cloud vPLC, Linux, Windows,
+  Raspberry Pi, RevPi, ctrlX, PLCnext, WAGO, Weidmüller, ...): setup,
+  platform, license, I/O.
 - logiccloud-connections: MQTT, Modbus, OPC UA and other connections and
-  their variable mappings.
+  their variable mappings; logiccloud-connection-* for each type.
 - logiccloud-alarms: alarm settings, acknowledging or shelving alarms on a
   device, alarm e-mail notifications.

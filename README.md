@@ -11,7 +11,7 @@ tools.
 | MCP server | `https://mcp.<domain>/mcp` | `https://mcp.<domain>/mcp` |
 | Login | OAuth at `https://auth.<domain>` (Keycloak client `lc-mcp`) | OAuth at `https://keycloak.<domain>` (Keycloak client `lco-mcp`), or an API key |
 | CLI | `lc` | `lco` |
-| Skills | `logiccloud`, `logiccloud-hmi`, `logiccloud-devices`, `logiccloud-connections`, `logiccloud-alarms` | `logiccloud-orchestrate`, `logiccloud-orchestrate-deployments`, `logiccloud-orchestrate-alerts` |
+| Skills | `logiccloud`, `logiccloud-hmi`, `logiccloud-devices`, `logiccloud-connections`, `logiccloud-alarms`, plus `logiccloud-device-*` per device family and `logiccloud-connection-*` per connection type | `logiccloud-orchestrate`, `logiccloud-orchestrate-deployments`, `logiccloud-orchestrate-alerts` |
 | Plugin | `control@logiccloud` | `orchestrate@logiccloud` |
 
 Every installation of logiccloud runs on its own domain, and everything else

@@ -26,6 +26,12 @@ Use the `lc` CLI or the MCP server `logiccloud-control`, whichever is there
 | Try it (the runtime must be running) | `lc connection test <id>` | `test_connection` |
 | Delete (name as confirmation) | `lc connection delete <id> -name "<Name>"` | `delete_connection` |
 
+Each type has its own skill with its fields, sub-objects, mappings and
+pitfalls: logiccloud-connection-mqtt, -modbus (TCP and RTU), -opcua-client,
+-opcua-server, -influxdb, -kafka, -rest-rpc, -node-red, -sparkplug (Cloud
+and External), -ctrlx, -weidmueller, -revpi, -raspberry-pi, -io-link, -sap,
+-tibber.
+
 ## Settings, sub-objects and mappings
 
 - An update replaces the whole connection: read the definition, change it,

@@ -23,6 +23,37 @@ skill, alarms in logiccloud-alarms.
 | Runtimes with their device and state | `lc runtimes -project <id> -status started` (`-platform`, `-tag`) | `list_runtimes` (`states`, `platforms`, `tags`) |
 | One runtime: build, state on the device, pending changes, connections | `lc runtime <id>` | `get_runtime` |
 
+## Platforms and device types
+
+A build runs only on the platforms it was built for, and `lc deploy` /
+`deploy` refuses a build without the device's exact platform (`lc devices`
+shows it): `Amd64` for cloud vPLCs (the `lc init` default), `x86_64` for
+edge PCs, `Arm64`, `Arm/V7`. Build for others with
+`lc build -platform x86_64` (several: `-platform Amd64,Arm64`;
+`build` with `platforms`). Physical devices are added in the portal and set
+up on the device by the user; `lc` only creates cloud vPLCs.
+
+What is specific to a device type (setup, license, HMI path, its I/O) is in
+its skill:
+
+| Device types | Skill |
+|---|---|
+| vPLC Cloud Development, S1-S4 | logiccloud-device-vplc |
+| Kubernetes vPLC S1 | logiccloud-device-kubernetes |
+| Generic ARM 64 / ARM v7 / X86/64, Hilscher netFIELD and sensorEDGE, Kontron, FESTO, NXTGN | logiccloud-device-linux |
+| Windows 10/11, Windows Server | logiccloud-device-windows |
+| Raspberry Pi 4B, 5, Cluster | logiccloud-device-raspberry-pi |
+| KUNBUS Revolution Pi | logiccloud-device-revpi |
+| Weidmüller UC20 (u-OS) | logiccloud-device-weidmueller |
+| Bosch Rexroth ctrlX CORE | logiccloud-device-ctrlx |
+| Phoenix Contact PLCnext | logiccloud-device-plcnext |
+| WAGO CC100 | logiccloud-device-wago |
+| Murrelektronik Xelity | logiccloud-device-murrelektronik |
+| INSYS icom MRX | logiccloud-device-insys-mrx |
+| Perinet periMICA | logiccloud-device-perimica |
+| IXON SecureEdge Pro | logiccloud-device-ixon |
+| Hirschmann/Belden OpEdge | logiccloud-device-opedge |
+
 ## Deploy and run
 
 | Task | lc | MCP tool |
