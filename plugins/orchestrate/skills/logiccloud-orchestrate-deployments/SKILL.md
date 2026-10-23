@@ -30,6 +30,15 @@ REMOVED. An instance's `lastError` and the device's log
 1. Find the version: `lco apps` and `lco app <appId>`, or
    `list_applications` and `get_application`. Deployments take the
    **version ID** from that list, not the application ID.
+
+   The same list shows each version's deployment profiles (id and type,
+   e.g. `kubernetes (helm)`, `compose (compose)`). When a version declares
+   more than one, choose the one the devices run: `compose` for Docker
+   devices (FLECS and other compose runtimes), `helm` for Kubernetes
+   devices (`lco device <id>`, `get_device` show the capabilities). If it
+   is not clear, ask the user. Never let the server pick: without a choice
+   it serves the version's primary profile, which may not run on the
+   device. Each chosen profile becomes a deployment of its own.
 2. Pick targets, one way or the other, plus device groups if wanted:
    - device IDs (`-device <id>`, `deviceIds`), or
    - labels (`-label k=v`, `labels`) and label expressions
@@ -46,12 +55,15 @@ REMOVED. An instance's `lastError` and the device's log
 3. Show the user the request and the devices it reaches (a dry run), then
    create it:
 
-       lco deploy -name "<Name>" -version <versionId> -device <id> -param httpPort=28080 -dry-run
-       lco deploy -name "<Name>" -version <versionId> -device <id> -param httpPort=28080
+       lco deploy -name "<Name>" -version <versionId> -app <appId> -profile compose -device <id> -param httpPort=28080 -dry-run
+       lco deploy -name "<Name>" -version <versionId> -app <appId> -profile compose -device <id> -param httpPort=28080
 
-   With the tools: `create_deployment` with `dryRun: true` (body and
-   devices), then the same call without it. `preview_deployment_targets`
-   lists the devices targets reach without a body.
+   With the tools: `create_deployment` with `applicationId`,
+   `deploymentProfileIds` and `dryRun: true` (body, profiles served and
+   devices), then the same call without `dryRun`. Without
+   `deploymentProfileIds` the tool refuses a version with several profiles
+   and lists them. `preview_deployment_targets` lists the devices targets
+   reach without a body.
 
 Parameters (`-param k=v`, `parameters`) override the version's manifest
 parameters; an earlier deployment of the same app (`lco deployment <id>`,
@@ -82,7 +94,8 @@ parameters; an earlier deployment of the same app (`lco deployment <id>`,
 
 | Task | lco | MCP tool |
 |---|---|---|
-| Another version and/or parameters, in place (no uninstall) | `lco deployment redeploy <id> -version <versionId> -param k=v -unparam old -dry-run` | `redeploy_deployment` |
+| Another version and/or parameters, in place (no uninstall); the deployment keeps its profile, so the new version must declare it | `lco deployment redeploy <id> -version <versionId> -param k=v -unparam old -dry-run` | `redeploy_deployment` |
+| Another deployment profile | create a new deployment with that profile, then delete the old one | `create_deployment`, `delete_deployment` |
 | Name, parameters, targets, namespace, desired state, priority, schedule | `lco deployment update <id> -param k=v -unparam old -dry-run` | `update_deployment` |
 | Only on one device (split off unless it is the only target) | `lco deployment update <id> -on-device <deviceId> ...` | `update_deployment_on_device` |
 | Remove it from devices or a label group (uninstalls there) | `lco deployment targets remove <id> -name "<Name>" -device <id>` (or `-group k=v`) | `deployment_targets` remove (`confirmName`) |
