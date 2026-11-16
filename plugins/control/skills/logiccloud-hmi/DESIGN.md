@@ -8,9 +8,10 @@ page format is in the workspace's AGENTS.md (or CLAUDE.md).
 
 ## Canvas and layout
 
-- Design on the Desktop breakpoint, 1920×1080. Tablet (768×1024) and Mobile
-  (375×812) inherit it; override with `"layouts": {"Mobile": {...}}` where the
-  Desktop layout does not fit.
+- Design on the Desktop breakpoint, 1920×1080. By default write only the
+  Desktop layout. Tablet (768×1024) and Mobile (375×812) inherit it. Write
+  `"layouts": {"Tablet": {...}}` or `{"Mobile": {...}}` only when the user asks
+  for a Tablet or Mobile layout, and only for the breakpoints they name.
 - Positions and sizes on a 10 px grid. Keep 20 px from the page edges and 20 px
   between groups, 10 px between controls inside a group.
 - A page has one purpose (overview, one machine, settings, alarms). Title or

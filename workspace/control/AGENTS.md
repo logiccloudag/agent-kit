@@ -75,8 +75,10 @@ A page:
       ]
     }
 
-- Positions and sizes are pixels on the Desktop breakpoint (1920×1080).
-  Override them per breakpoint with `"layouts": {"Mobile": {"x": 0, "w": 375}}`.
+- Positions and sizes are pixels on the Desktop breakpoint (1920×1080). By
+  default write only the Desktop layout. Only when the user asks for a Tablet
+  or Mobile layout, override per breakpoint with
+  `"layouts": {"Mobile": {"x": 0, "w": 375}}`.
 - Only set the properties you need; unset ones use the component's defaults.
 - Bind variables by their name under Inputs/Outputs, i.e. the ST variable
   name (`<instance>_<member>` for FB members, `<var>_OUT` for IN_OUT). The
