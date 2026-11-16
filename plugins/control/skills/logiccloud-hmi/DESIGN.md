@@ -97,6 +97,9 @@ aligned, values right aligned or centered, units in `unit`, not in the label.
 - Border radius: 3 px for controls (default), 10 px for panels and cards, 0 for
   headers and full-width bars, 20 px for pills.
 - Borders: 1 px `#cccccc` on controls; none on labels (`"borderWidth": "0px"`).
+- Unset properties get the designer's defaults (see `hmi_components`), and
+  `LcLabel` defaults to a white box: give every label on a colored or page
+  background `"backgroundColor": "#ffffff00"` (transparent).
 - Padding: 10 px inside panels (`"padding": "10px 10px 10px 10px"`).
 - No shadows except to lift a popup.
 
@@ -138,7 +141,8 @@ A light overview page with a header, a value group and commands:
         {"type": "LcHeader", "x": 0, "y": 0, "w": 1920, "h": 60,
          "props": {"backgroundColor": "#0f5978", "borderRadius": "0px"}},
         {"type": "LcLabel", "x": 20, "y": 10, "w": 600, "h": 40,
-         "props": {"text": "Tank 1", "fontSize": 24, "color": "#ffffff", "borderWidth": "0px"}},
+         "props": {"text": "Tank 1", "fontSize": 24, "color": "#ffffff",
+                   "backgroundColor": "#ffffff00", "borderWidth": "0px"}},
         {"type": "LcPanel", "x": 20, "y": 80, "w": 400, "h": 300,
          "props": {"backgroundColor": "#ffffff", "borderColor": "#cccccc", "borderRadius": "10px",
                    "hasHeader": true, "headerBackgroundColor": "#0f5978", "text": "Process"},
@@ -153,7 +157,7 @@ A light overview page with a header, a value group and commands:
          "props": {"stateVariable": "pumpOn",
                    "states": [{"color": "#b8b7b8"}, {"value": 1, "color": "#8bc34a"}]}},
         {"type": "LcLabel", "x": 510, "y": 95, "w": 200, "h": 30,
-         "props": {"text": "Pump", "color": "#424242", "borderWidth": "0px"}},
+         "props": {"text": "Pump", "color": "#424242", "backgroundColor": "#ffffff00", "borderWidth": "0px"}},
         {"type": "LcButton", "x": 440, "y": 160, "w": 120, "h": 40,
          "props": {"text": "Start", "backgroundColor": "#0f5978", "color": "#ffffff", "targetVariable": "start"}},
         {"type": "LcButton", "x": 580, "y": 160, "w": 120, "h": 40,
