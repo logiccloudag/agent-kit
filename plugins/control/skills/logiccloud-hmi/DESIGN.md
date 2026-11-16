@@ -27,6 +27,10 @@ page format is in the workspace's AGENTS.md (or CLAUDE.md).
   child goes at y = 10, not below the header height.
 - Panel size: width = right edge of the widest child + 10; height = 36 (header)
   + bottom edge of the lowest child + 10.
+- A labelled `LcOutput`, `LcNumericInput` or `LcStringInput` stacks the label
+  above the field, and the field gets the rest of the height: use h = 50 or more
+  at 14 px (label row about 17 px, field 33 px), plus the extra size for larger
+  `fontSize` or `labelFontSize`. Leave 10 px between stacked controls.
 - Align controls in a group to the same left edge and the same width. In a row,
   align inputs, outputs, buttons and labels by their bottom edge, and gauges and
   images by their center line.
@@ -154,15 +158,15 @@ A light overview page with a header, a value group and commands:
         {"type": "LcLabel", "x": 20, "y": 10, "w": 600, "h": 40,
          "props": {"text": "Tank 1", "fontSize": 24, "color": "#ffffff",
                    "backgroundColor": "#ffffff00", "borderWidth": "0px"}},
-        {"type": "LcPanel", "x": 20, "y": 80, "w": 400, "h": 235,
+        {"type": "LcPanel", "x": 20, "y": 80, "w": 400, "h": 255,
          "props": {"backgroundColor": "#ffffff", "borderColor": "#cccccc", "borderRadius": "10px",
                    "hasHeader": true, "headerBackgroundColor": "#0f5978", "text": "Process"},
          "children": [
-           {"type": "LcOutput", "x": 10, "y": 10, "w": 380, "h": 40,
+           {"type": "LcOutput", "x": 10, "y": 10, "w": 380, "h": 50,
             "props": {"label": "Level", "unit": "%", "precision": 1, "valueVariable": "level"}},
-           {"type": "LcOutput", "x": 10, "y": 60, "w": 380, "h": 40,
+           {"type": "LcOutput", "x": 10, "y": 70, "w": 380, "h": 50,
             "props": {"label": "Temperature", "unit": "°C", "precision": 1, "valueVariable": "temperature"}},
-           {"type": "LcNumericInput", "x": 10, "y": 110, "w": 380, "h": 79,
+           {"type": "LcNumericInput", "x": 10, "y": 130, "w": 380, "h": 79,
             "props": {"label": "Setpoint", "min": 0, "max": 90, "targetVariable": "setpoint"}}]},
         {"type": "LcStateIndicator", "x": 440, "y": 80, "w": 60, "h": 60,
          "props": {"stateVariable": "pumpOn",
