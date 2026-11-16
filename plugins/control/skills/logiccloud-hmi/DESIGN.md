@@ -20,9 +20,17 @@ page format is in the workspace's AGENTS.md (or CLAUDE.md).
 - Put a header across the top for multi-page HMIs: `LcHeader` at 0,0, 1920×60,
   with `LcNavigationItem`s in it (or an `LcSideBar` on the left). Content starts
   at y = 80.
-- Group what belongs together in an `LcPanel`; children are positioned relative
-  to the panel. Align controls in a group to the same left edge and the same
-  width.
+- Group related controls in an `LcPanel`; the page header, the page title and
+  navigation may stay outside panels.
+- Panel children are positioned relative to the panel body, which starts below
+  the header (`headerSize`, default 36 px, when `hasHeader` is true). The first
+  child goes at y = 10, not below the header height.
+- Panel size: width = right edge of the widest child + 10; height = 36 (header)
+  + bottom edge of the lowest child + 10.
+- Align controls in a group to the same left edge and the same width. In a row,
+  align inputs, outputs, buttons and labels by their bottom edge, and gauges and
+  images by their center line.
+- Write meaningful texts: "Start pump", not "Button 1".
 - Leave room: a page that fills every pixel is hard to read on a machine.
 
 ## Colors
@@ -111,6 +119,8 @@ aligned, values right aligned or centered, units in `unit`, not in the label.
 | Number from the PLC | `LcOutput` (with `label`, `unit`, `precision`) | `valueVariable` |
 | Level, speed, a key value | `LcGauge`, `LcVerticalGauge`, `LcLinearGauge`, `LcThermometer` | `valueVariable`, `min`/`max` |
 | Setpoint | `LcNumericInput` (`min`, `max`, `step`) | `targetVariable` |
+| Setpoint by dragging | `LcSlider` (`min`, `max`, `step`) | `targetVariable` |
+| Text from the PLC | `LcStringOutput` (with `label`) | `textVariable` |
 | Text input | `LcStringInput` | `targetVariable` |
 | Choice | `LcDropdown`, `LcCheckbox` (`value1` checked, `value2` unchecked) | `targetVariable` |
 | Start, stop, reset (momentary) | `LcButton` with `"buttonMode": "momentary"` (writes `pushValue`, default 1, on press and `value`, default 0, on release) | `targetVariable` |
@@ -144,15 +154,15 @@ A light overview page with a header, a value group and commands:
         {"type": "LcLabel", "x": 20, "y": 10, "w": 600, "h": 40,
          "props": {"text": "Tank 1", "fontSize": 24, "color": "#ffffff",
                    "backgroundColor": "#ffffff00", "borderWidth": "0px"}},
-        {"type": "LcPanel", "x": 20, "y": 80, "w": 400, "h": 300,
+        {"type": "LcPanel", "x": 20, "y": 80, "w": 400, "h": 235,
          "props": {"backgroundColor": "#ffffff", "borderColor": "#cccccc", "borderRadius": "10px",
                    "hasHeader": true, "headerBackgroundColor": "#0f5978", "text": "Process"},
          "children": [
-           {"type": "LcOutput", "x": 10, "y": 50, "w": 380, "h": 40,
+           {"type": "LcOutput", "x": 10, "y": 10, "w": 380, "h": 40,
             "props": {"label": "Level", "unit": "%", "precision": 1, "valueVariable": "level"}},
-           {"type": "LcOutput", "x": 10, "y": 100, "w": 380, "h": 40,
+           {"type": "LcOutput", "x": 10, "y": 60, "w": 380, "h": 40,
             "props": {"label": "Temperature", "unit": "°C", "precision": 1, "valueVariable": "temperature"}},
-           {"type": "LcNumericInput", "x": 10, "y": 150, "w": 380, "h": 79,
+           {"type": "LcNumericInput", "x": 10, "y": 110, "w": 380, "h": 79,
             "props": {"label": "Setpoint", "min": 0, "max": 90, "targetVariable": "setpoint"}}]},
         {"type": "LcStateIndicator", "x": 440, "y": 80, "w": 60, "h": 60,
          "props": {"stateVariable": "pumpOn",

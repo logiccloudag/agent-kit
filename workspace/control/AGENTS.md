@@ -71,7 +71,7 @@ A page:
         {"type": "LcNumericInput", "x": 600, "y": 100, "w": 220, "h": 79,
          "props": {"label": "Setpoint", "targetVariable": "setpoint"}},
         {"type": "LcPanel", "x": 40, "y": 400, "w": 400, "h": 200, "props": {"text": "Details"},
-         "children": [ ... positioned relative to the panel ... ]}
+         "children": [ ... relative to the panel body, below its header: first child at y = 10 ... ]}
       ]
     }
 
