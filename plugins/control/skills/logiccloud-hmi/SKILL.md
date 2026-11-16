@@ -42,6 +42,11 @@ the portal.
   page under `updatedFiles`. Keep them after that.
 - `hmi/*.portal.json` pages were made in the portal and are read-only. Use
   them as examples of what the user's HMI already looks like, and match their
-  style where they differ from the design guide.
+  style where they differ from the design guide. A page you wrote becomes
+  `.portal.json` as soon as someone saves it in the portal designer; after
+  that, change it only in the portal.
+- The running HMI shows the page of the deployed build, not the saved page.
+  After changing a page, build and deploy (the logiccloud-devices skill)
+  before you compare the running HMI with the designer.
 - Upload and fix every `hmi/<Name>.page.json: error: ...`: `lc check`, or
   `write_files` with `build: true`.

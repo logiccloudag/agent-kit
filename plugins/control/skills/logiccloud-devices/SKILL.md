@@ -63,7 +63,14 @@ devices are plain Docker hosts: use the network connections.
 | Cancel a running build | `lc build cancel <id>` | `cancel_build` |
 
 A deploy uses the latest successful build (build first: the logiccloud skill)
-and waits for the device's result. Never pass `-replace` to `lc deploy`
+and waits for the device's result. It also creates the runtime when the
+device has none for the project. Create and change runtimes only with
+`deploy`, never with raw `createRuntime` or `updateRuntime` mutations: a
+runtime names the configuration and resource it starts, and a wrong name
+builds fine but the runtime does not start ("configuration '...' not
+found"). The configuration is the file `configuration/<Name>.json` (its
+`<Name>`), the resource is a `resources[].name` in it. A program
+configuration (`programs[].name`) is never a runtime's configuration. Never pass `-replace` to `lc deploy`
 (`replace` to `deploy`) unless the user said so: it replaces another
 project's runtime on the device. If every device runs another project and the
 user wants a new one, create a cloud vPLC:
@@ -86,7 +93,10 @@ health check say when).
 | Another process's log | `lc logs -device <id> -target <process>` | `device_logs` (`target`) |
 
 The health check lists the processes (log targets). A runtime that is not
-started usually says why (`notStartedReason`), and the log says the rest. Two
+started usually says why (`notStartedReason`), and the log says the rest.
+A runtime that restarts in a loop can still show the state `started`: read
+the runtime log (or `crashLoop` and `lastPanic` in the health check) before
+you report a deploy as successful. Two
 messages are normal on healthy runtimes: "Metrics unavailable" in the health
 check, and a "broken pipe" error in the runtime log when the HMI connects.
 
