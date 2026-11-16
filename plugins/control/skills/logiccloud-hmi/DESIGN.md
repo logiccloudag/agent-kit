@@ -85,8 +85,8 @@ No custom fonts; sizes in px (`fontSize`, `labelFontSize`, `valueFontSize`):
 |---|---|
 | Page title | 24 (32 for a single-machine overview) |
 | Group title, panel header | 18 |
-| Labels, values, buttons (default) | 16 |
-| Secondary text, units, navigation | 14 |
+| Labels, values, buttons | 14 (the designer default; leave `fontSize` unset) |
+| Secondary text, units, navigation | 12 |
 | Key value on an overview (tank level, speed) | 32 to 48 |
 
 Text `#424242` on light surfaces, `#ffffff` on primary or dark. Labels left
@@ -112,9 +112,10 @@ aligned, values right aligned or centered, units in `unit`, not in the label.
 | Level, speed, a key value | `LcGauge`, `LcVerticalGauge`, `LcLinearGauge`, `LcThermometer` | `valueVariable`, `min`/`max` |
 | Setpoint | `LcNumericInput` (`min`, `max`, `step`) | `targetVariable` |
 | Text input | `LcStringInput` | `targetVariable` |
-| Choice | `LcDropdown`, `LcCheckbox` | `targetVariable` |
-| Start, stop, reset (momentary) | `LcButton` | `targetVariable` |
-| On/off (latching) | `LcToggleButton` | `targetVariable`, `stateVariable` |
+| Choice | `LcDropdown`, `LcCheckbox` (`value1` checked, `value2` unchecked) | `targetVariable` |
+| Start, stop, reset (momentary) | `LcButton` with `"buttonMode": "momentary"` (writes `pushValue`, default 1, on press and `value`, default 0, on release) | `targetVariable` |
+| Write one value on click | `LcButton` with `value` (required: without it the button writes 0) | `targetVariable` |
+| On/off (latching) | `LcToggleButton` (`value1` on, `value2` off; both required) | `targetVariable`, `stateVariable` |
 | Status lamp | `LcStateIndicator` | `stateVariable` + `states` |
 | Tank, machine drawing | `LcShape`, `LcStateImage`, `LcImage` | `stateVariable` |
 | Pipes, flow lines | `LcLine`, `LcPipe`, `LcVerticalPipe`, `LcPolyline` | `stateVariable` |
@@ -159,9 +160,11 @@ A light overview page with a header, a value group and commands:
         {"type": "LcLabel", "x": 510, "y": 95, "w": 200, "h": 30,
          "props": {"text": "Pump", "color": "#424242", "backgroundColor": "#ffffff00", "borderWidth": "0px"}},
         {"type": "LcButton", "x": 440, "y": 160, "w": 120, "h": 40,
-         "props": {"text": "Start", "backgroundColor": "#0f5978", "color": "#ffffff", "targetVariable": "start"}},
+         "props": {"text": "Start", "backgroundColor": "#0f5978", "color": "#ffffff",
+                   "buttonMode": "momentary", "targetVariable": "start"}},
         {"type": "LcButton", "x": 580, "y": 160, "w": 120, "h": 40,
-         "props": {"text": "Stop", "backgroundColor": "#cf252c", "color": "#ffffff", "targetVariable": "stop"}}
+         "props": {"text": "Stop", "backgroundColor": "#cf252c", "color": "#ffffff",
+                   "buttonMode": "momentary", "targetVariable": "stop"}}
       ]
     }
 
