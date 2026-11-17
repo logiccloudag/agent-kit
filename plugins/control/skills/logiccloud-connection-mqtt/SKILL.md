@@ -22,7 +22,8 @@ scratch.
   name and the consumers/producers; lc and the MCP create it first and then
   add them with their topics below the generated user, as the portal does.
   A topic without the prefix is taken as the subtopic (`counters` becomes
-  `<username>/counters`); an empty subtopic is refused. `false` uses
+  `<username>/counters`); no subtopic gives `<username>/`, the portal's
+  default, which the runtime then subscribes to. `false` uses
   `broker`, a URL such as `mqtts://broker.example.com:8883`, with
   `username`/`password`.
 - Certificates (`rootCACert`, `clientCert`, `clientKey`, `clientCACert`) are
@@ -44,7 +45,9 @@ They are part of the definition (`producers[]`, `consumers[]`), so an update
 with the whole definition changes them. Each needs an `_id` (24 hex digits,
 a new ObjectId for a new one; keep existing ones).
 
-- Every producer and consumer needs a `topic`; an empty one is refused.
+- On an own broker every producer and consumer needs a `topic`; an empty one
+  is refused. A consumer topic may hold wildcards (`+`, `#`) but no `//` and
+  no `.` or `..` segment, as in the portal.
 - Producer: publishes `{OUT}` variables. `topic`, `qos` 0/1/2, `retain`,
   `payloadType`, `payloadFormat` (JSON template, `"{}"`), `trigger`
   (`OnChange`, `GroupChanges` = all mapped values when one changes,
