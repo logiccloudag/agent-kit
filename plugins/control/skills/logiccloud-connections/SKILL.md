@@ -23,7 +23,7 @@ Use the `lc` CLI or the MCP server `logiccloud-control`, whichever is there
 | Replace the settings | `lc connection update <id> -f c.json` | `update_connection` |
 | Create | `lc connection create -runtime <id> -type Mqtt -f c.json` | `create_connection` |
 | Copy completely (sub-objects, mappings) | `lc connection copy <id> -runtime <id> -name "<Name>"` | `copy_connection` |
-| Try it (the runtime must be running) | `lc connection test <id>` | `test_connection` |
+| Check the broker login (MQTT and Sparkplug B only; runs in the cloud, not on the device) | `lc connection test <id>` | `test_connection` |
 | Delete (name as confirmation) | `lc connection delete <id> -name "<Name>"` | `delete_connection` |
 
 Each type has its own skill with its fields, sub-objects, mappings and

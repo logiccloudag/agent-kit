@@ -86,6 +86,6 @@ Example producer (inside `producers`):
 - Map REAL to `Float32`, LREAL to `Float64`, INT to `Int16`, DINT to `Int32`,
   BOOL to `Boolean`, STRING to `String`.
 - Nothing arrives? Check the topic (cloud topics are `<username>/...`),
-  `lc connection test` / `test_connection` (the runtime must be started),
-  then the runtime log (logiccloud-devices skill). A new or changed
+  `lc connection test` / `test_connection` (the platform connects to the
+  broker from the cloud; it does not test the device), then the runtime log (logiccloud-devices skill). A new or changed
   connection reaches the device with the next deploy.
