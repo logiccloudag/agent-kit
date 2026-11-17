@@ -85,7 +85,9 @@ documentation on MCP servers and skills:
      redirect URI `http://localhost:33418/callback` and the scopes
      `openid profile email offline_access`. The server's
      `/.well-known/oauth-protected-resource/mcp` names the authorization
-     server (`https://auth.<control domain>/realms/<control domain>`).
+     server (the Keycloak realm, for example
+     `https://auth.dev.logiccloud.io/realms/control-dev`; the realm is not
+     always named after the domain, so read it there).
      Use this client rather than dynamic client registration. If your client
      can only use another redirect URI, tell the user: an administrator has to
      allow it for `lc-mcp` in Keycloak.

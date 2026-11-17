@@ -17,7 +17,12 @@ Nearly every field is required, so start from an existing connection
 scratch.
 
 - `isCloud: true` uses the installation's own broker: it generates broker,
-  user and password, and topics get a generated prefix. `false` uses
+  user and password. The broker allows only topics below that user, so every
+  topic is `<username>/<subtopic>`. Create the connection with `isCloud`, a
+  name and the consumers/producers; lc and the MCP create it first and then
+  add them with their topics below the generated user, as the portal does.
+  A topic without the prefix is taken as the subtopic (`counters` becomes
+  `<username>/counters`); an empty subtopic is refused. `false` uses
   `broker`, a URL such as `mqtts://broker.example.com:8883`, with
   `username`/`password`.
 - Certificates (`rootCACert`, `clientCert`, `clientKey`, `clientCACert`) are
@@ -25,10 +30,12 @@ scratch.
   `NoClientCert` unless the broker wants a client certificate.
   `skipServerCertCheck` only when the user accepts it.
 - `protocolVersion`: `Mqtt_3_1_1` (or `Mqtt_3_1`). No MQTT 5.
-- Times are milliseconds. What the portal stores: keepAlive 30000,
+- Times are milliseconds (the API schema says so too). Fields left out of
+  a new connection get the portal's values: keepAlive 30000,
   pingTimeout 10000, connectTimeout 30000, connectRetryInterval 30000,
   maxReconnectInterval 300000, disconnectTimeout 250, writeTimeout 0,
-  cleanSession, order, autoReconnect and connectRetry true.
+  subscribeTimeout 1000, cleanSession, order, autoReconnect and
+  connectRetry true.
 - Last will: `willEnabled`, `willTopic`, `willPayload`, `willQos`, `willRetained`.
 
 ## Producers, consumers, mappings
@@ -37,6 +44,7 @@ They are part of the definition (`producers[]`, `consumers[]`), so an update
 with the whole definition changes them. Each needs an `_id` (24 hex digits,
 a new ObjectId for a new one; keep existing ones).
 
+- Every producer and consumer needs a `topic`; an empty one is refused.
 - Producer: publishes `{OUT}` variables. `topic`, `qos` 0/1/2, `retain`,
   `payloadType`, `payloadFormat` (JSON template, `"{}"`), `trigger`
   (`OnChange`, `GroupChanges` = all mapped values when one changes,
@@ -74,5 +82,7 @@ Example producer (inside `producers`):
   and tell the user instead of updating.
 - Map REAL to `Float32`, LREAL to `Float64`, INT to `Int16`, DINT to `Int32`,
   BOOL to `Boolean`, STRING to `String`.
-- Nothing arrives? Check the topic (cloud topics carry the generated prefix),
-  `lc connection test`, then the runtime log (logiccloud-devices skill).
+- Nothing arrives? Check the topic (cloud topics are `<username>/...`),
+  `lc connection test` / `test_connection` (the runtime must be started),
+  then the runtime log (logiccloud-devices skill). A new or changed
+  connection reaches the device with the next deploy.

@@ -21,7 +21,13 @@ skill, alarms in logiccloud-alarms.
 | Devices (`-project <id>`: those running it) | `lc devices` | `list_devices` (`projectId`) |
 | One device and its runtime | `lc device <id>` | `get_device` |
 | Runtimes with their device and state | `lc runtimes -project <id> -status started` (`-platform`, `-tag`) | `list_runtimes` (`states`, `platforms`, `tags`) |
-| One runtime: build, state on the device, pending changes, connections | `lc runtime <id>` | `get_runtime` |
+| One runtime: build, state on the device, whether its build is installed, a newer build, connections, HMI link | `lc runtime <id>` | `get_runtime` |
+
+The runtime's state is the one on its device (`state`, `notStartedReason`).
+A plcHmi project's HMI is in `hmi` of `get_runtime`, `get_device`, `deploy`
+and `device_health`: `hmi.url` on a cloud vPLC (the portal serves it), or
+`hmi.path` relative to an edge device's own web UI, reachable only in that
+device's network. `hmi.available` is false until the runtime is started.
 
 ## Platforms
 
