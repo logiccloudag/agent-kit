@@ -108,7 +108,12 @@ check, and a "broken pipe" error in the runtime log when the HMI connects.
 
 ## Live values
 
-The runtime must be started. Variables are named as the device reports them.
+The runtime must be started, and the device must run the optional device
+process `debugging-service` (as for debugging in the portal). New devices do not
+have it; `lc vars` / `read_variables` then say so at once. With the user's
+consent, assign it with `lc device enable-process <id> -target debugging-service`
+or `device_action` `enableProcess`; the device needs about a minute to start it.
+Variables are named as the device reports them.
 
 | Task | lc | MCP tool |
 |---|---|---|
