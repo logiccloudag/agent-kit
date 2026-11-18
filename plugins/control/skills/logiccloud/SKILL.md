@@ -18,7 +18,12 @@ control.
   directly on the project in the cloud. If the tools are missing or say the
   user is not logged in, ask the user to log in through their agent (`/mcp`
   in Claude Code, `codex mcp login logiccloud-control`,
-  `opencode mcp auth logiccloud-control`).
+  `opencode mcp auth logiccloud-control`). A platform that cannot run that
+  login (an agent platform or a script) sends an API key in the `X-API-Key`
+  header instead. The user creates it with `lc token create -domain <domain>`,
+  logged in as the user the key acts for, and revokes it with
+  `lc token revoke` (`-all` for every key). Never print or store a key in the
+  project.
 
 | Task | lc | MCP tool |
 |---|---|---|
