@@ -36,6 +36,7 @@ the portal.
 - Positions in px on the Desktop breakpoint (1920×1080), on a 10 px grid.
   Write only the Desktop layout unless the user asks for Tablet or Mobile
   layouts (`"layouts"` per component, see the design guide).
+- `LcGauge` and `Lc90DegMeter` draw a square dial of w×w: use h >= w + 10.
 - Status lamps and other components with a `stateVariable` need `states`;
   LcToggleButton, LcStateImage, LcSvg and lines have their own state
   properties instead.

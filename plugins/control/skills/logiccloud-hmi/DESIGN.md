@@ -31,6 +31,14 @@ page format is in the workspace's AGENTS.md (or CLAUDE.md).
   above the field, and the field gets the rest of the height: use h = 50 or more
   at 14 px (label row about 17 px, field 33 px), plus the extra size for larger
   `fontSize` or `labelFontSize`. Leave 10 px between stacked controls.
+- `LcGauge` and `Lc90DegMeter` draw a square dial with side = `w`, and clip it
+  to the component. Use `h` >= `w` + 10, which keeps the 10 px grid: a gauge of
+  430×220 loses the top and bottom of its dial. Size it by the space you have,
+  and center it in its panel:
+  x = (panel w - gauge w) / 2. A label or lamp below it goes at
+  y = gauge y + gauge h + 10. Example: in a 450 wide panel, a gauge of 230×240
+  at x = 110, y = 10, and its status label at y = 260.
+- Panels in one row have the same width and the same height.
 - Align controls in a group to the same left edge and the same width. In a row,
   align inputs, outputs, buttons and labels by their bottom edge, and gauges and
   images by their center line.
@@ -100,6 +108,11 @@ No custom fonts; sizes in px (`fontSize`, `labelFontSize`, `valueFontSize`):
 | Labels, values, buttons | 14 (the designer default; leave `fontSize` unset) |
 | Secondary text, units, navigation | 12 |
 | Key value on an overview (tank level, speed) | 32 to 48 |
+
+One page uses one size for all `LcOutput`, `LcNumericInput`, `LcStringOutput`
+and `LcStringInput`: leave `fontSize` unset (14). Show key values in gauges or
+as one prominent value, not by enlarging a whole panel of outputs. A text label
+next to a status lamp has the same size as the values.
 
 Text `#424242` on light surfaces, `#ffffff` on primary or dark. Labels left
 aligned, values right aligned or centered, units in `unit`, not in the label.
@@ -189,4 +202,11 @@ A light overview page with a header, a value group and commands:
 - Colors from the tables above; one scheme for the whole HMI.
 - Every status lamp has `states` and a label.
 - Values have a `unit` and a sensible `precision`.
-- Nothing overlaps unless it is a child of a panel.
+- Nothing overlaps unless it is a child of a panel or lies fully inside another
+  component (a label in a header).
+- Every panel child lies inside the panel body: x + w <= panel w and
+  y + h <= panel h - 36.
+- Every `LcGauge` and `Lc90DegMeter` has h >= w + 10 and is centered in its panel.
+- All value components (`LcOutput`, `LcNumericInput`, `LcStringOutput`,
+  `LcStringInput`) use one `fontSize`; status label text matches the values.
+- Panels in one row have the same width and height.

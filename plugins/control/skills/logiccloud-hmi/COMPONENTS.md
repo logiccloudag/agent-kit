@@ -1082,6 +1082,8 @@ Seen in real pages:
 
 Binds: maxVariable, minVariable, valueVariable
 
+Size: square: the dial is w×w; use h >= w + 10 (a smaller h cuts it off at top and bottom). Center it in its panel and put a label below at y = y + h + 10.
+
 Defaults:
 
 ```json
@@ -1874,6 +1876,8 @@ Seen in real pages:
 ## Lc90DegMeter
 
 Binds: maxVariable, minVariable, valueVariable
+
+Size: square: the dial is w×w; use h >= w + 10 (a smaller h cuts it off at top and bottom).
 
 Defaults:
 
