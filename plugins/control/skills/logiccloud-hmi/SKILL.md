@@ -19,7 +19,9 @@ the portal.
    to use for what. Follow it, so the page fits the other pages.
 2. Look up the components you use: [COMPONENTS.md](COMPONENTS.md), or the
    `hmi_components` tool. It lists their properties, the properties that bind
-   variables, and typical sizes.
+   variables, and typical sizes. With the tool, call it with `index: true`
+   first, then with `components: [...]` for the ones you use; the whole
+   reference is long.
 3. Check the page format: in the workspace's AGENTS.md or CLAUDE.md
    ("HMI pages") with `lc`, in the server's instructions with the tools.
 4. Make sure every variable you bind is declared with `HMI` in its pragma
@@ -41,8 +43,9 @@ the portal.
   LcToggleButton, LcStateImage, LcSvg and lines have their own state
   properties instead.
 - Leave out `id` and `wrapperId` on new components. The first upload adds
-  them: `lc check` writes them back into the file; `write_files` returns the
-  page under `updatedFiles`. Keep them after that.
+  them: `lc check` writes them back into the file; keep them after that. With
+  `write_files`, a later write of the page keeps the stored IDs when you leave
+  them out, and `edits` change a stored page without sending all of it.
 - `hmi/*.portal.json` pages were made in the portal and are read-only. Use
   them as examples of what the user's HMI already looks like, and match their
   style where they differ from the design guide. A page you wrote becomes
